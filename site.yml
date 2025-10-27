@@ -1,0 +1,53 @@
+- name: Deploy static mini finance website
+  hosts: web
+  become: yes
+  vars:
+    tmp_dir: "/home/azureuser/mini-finance-app"
+    nginx_root: "/var/www/html"
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Ensure Nginx is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Remove default Nginx index
+      file:
+        path: "{{ nginx_root }}/index.nginx-debian.html"
+        state: absent
+      ignore_errors: yes
+
+    - name: Clone static site into temporary directory
+      git:
+        repo: "https://github.com/blessedsoft/mini_finance"
+        dest: "{{ tmp_dir }}"
+        version: main
+        force: yes
+
+    - name: Deploy static site to Nginx root
+      copy:
+        src: "{{ tmp_dir }}/"
+        dest: "{{ nginx_root }}/"
+        owner: www-data
+        group: www-data
+        mode: '0755'
+        remote_src: yes
+
+    - name: Ensure proper ownership for Nginx root
+      file:
+        path: "{{ nginx_root }}"
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
