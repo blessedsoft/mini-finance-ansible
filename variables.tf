@@ -1,8 +1,16 @@
 variable "location" {
   description = "Azure region"
   type        = string
-  default     = "East US"
+  default     = "westeurope"
 }
+
+
+variable "subscription_id" {
+  description = "Azure Subscription ID"
+  type        = string
+  default     = "4bbdd8c0-4e93-4dbb-b6e3-6c41bb381ec7"
+}
+
 
 variable "resource_group_name" {
   description = "Resource group name"
@@ -13,7 +21,7 @@ variable "resource_group_name" {
 variable "vm_count" {
   description = "Number of VMs to create"
   type        = number
-  default     = 3
+  default     = 1
 }
 
 variable "vm_size" {

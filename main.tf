@@ -1,8 +1,3 @@
-provider "azurerm" {
-  subscription_id = "3b2b9d10-f659-45c4-9068-5ca3a8a64cd2"
-  features {}
-}
-
 # Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
@@ -63,6 +58,11 @@ resource "azurerm_public_ip" "vm_ip" {
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
+  sku                 = "Standard"
+
+    lifecycle {
+    ignore_changes = [tags]
+  }
 }
 
 # Network Interfaces
@@ -89,12 +89,12 @@ resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
 
 # Linux Virtual Machines
 resource "azurerm_linux_virtual_machine" "vm" {
-  count               = var.vm_count
-  name                = "vm-${count.index}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = var.location
-  size                = var.vm_size
-  admin_username      = var.admin_username
+  count                 = var.vm_count
+  name                  = "vm-${count.index}"
+  resource_group_name   = azurerm_resource_group.rg.name
+  location              = var.location
+  size                  = var.vm_size
+  admin_username        = var.admin_username
   network_interface_ids = [azurerm_network_interface.nic[count.index].id]
 
   admin_ssh_key {
